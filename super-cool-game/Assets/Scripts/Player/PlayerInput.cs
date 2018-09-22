@@ -15,7 +15,6 @@ public class PlayerInput : MonoBehaviour {
     }
     // Update is called once per frame
     void Update () {
-
         // Player wants to move laterally
         pm.Move(Input.GetAxis("Horizontal"));
 

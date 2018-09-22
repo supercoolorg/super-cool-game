@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour {
     public LayerMask groundLayer;
 
     private Rigidbody2D rb;
-    private float moveX;
+    private float moveX = 0;
 
     // Use this for initialization
     void Start() {
@@ -30,8 +30,6 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     void ComputeMovement () {
-        
-
         // Resultant of movement
         rb.velocity = new Vector2(moveX, rb.velocity.y);
 
@@ -49,7 +47,7 @@ public class PlayerMovement : MonoBehaviour {
 
     public void Jump () {
         // if player hasnt already jumped
-        if(IsGrounded()) {
+        if(IsGrounded) {
             rb.AddForce(new Vector2(0, jumpHeight), ForceMode2D.Impulse);
         } 
     }
@@ -58,20 +56,17 @@ public class PlayerMovement : MonoBehaviour {
     public void Move (float axisX) {
         moveX = axisX;
     }
-    // Uses a raycast to check if player is grounded
-    public bool IsGrounded () {
-        Vector2 position = transform.position;
-        Vector2 direction = Vector2.down;
-        
-        // Draw a vertical line for debug
-        Debug.DrawRay(position, direction, Color.green);
 
-        RaycastHit2D hit = Physics2D.Raycast(position, direction, checkGroundDistance, groundLayer);
-        if (hit.collider != null) {
-            Debug.DrawRay(position, direction, Color.red);
-            // The raycast hit something (= the ground)
-            return true;
+    // Uses a raycast to check if player is grounded
+    public bool IsGrounded {
+        get {
+            Vector2 position = transform.position;
+            Vector2 direction = Vector2.down;
+
+            RaycastHit2D hit = Physics2D.Raycast(position, direction, checkGroundDistance, groundLayer);
+            if (hit.collider != null)
+                return true;
+            return false;
         }
-        return false;
     }
 }
