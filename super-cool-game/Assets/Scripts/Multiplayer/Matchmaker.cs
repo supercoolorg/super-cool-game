@@ -6,39 +6,35 @@ using NetCode;
 
 public class Matchmaker : MonoBehaviour {
     TcpClient client;
+    NetworkStream stream;
 
     // Use this for initialization
-    async void Start () {
-        Debug.Log("Ask for lobby");
+    async void Start() {
+        Connect();
         int port = await GetLobby();
-        Debug.Log("Got lobby on port " + port);
-        Join(port);
-	}
-
-    private async Task<int> GetLobby() {
-        client = new TcpClient();
-        client.Connect(NetHelpers.SERVER_ADDR, NetHelpers.MATCHMAKER_PORT);
-        var stream = client.GetStream();
-
-        byte[] message = NetHelpers.BufferOp(OpCode.Queue);
-        await stream.WriteAsync(message, 0, NetHelpers.MESSAGE_SIZE);
-
-        byte[] buffer = new byte[NetHelpers.MESSAGE_SIZE];
-        await stream.ReadAsync(buffer, 0, NetHelpers.MESSAGE_SIZE);
-
-        byte op = buffer[0];
-        if(op == (byte)OpCode.FoundMatch) {
-            UInt16 port = NetHelpers.ReadUInt16(buffer, 1);
-            return port;
-        }
-        return -1;
+        client.Close();
+        var lobby = gameObject.GetComponent<Lobby>();
+        lobby.Connect(port);
     }
 
-    private void Join(int port) {
-        UdpClient socket = new UdpClient();
-        socket.Connect(NetHelpers.SERVER_ADDR, port);
+    private void Connect(){
+        client = new TcpClient();
+        client.Connect(NetHelpers.SERVER_ADDR, NetHelpers.MATCHMAKER_PORT);
+        stream = client.GetStream();
+    }
 
-        byte[] buffer = NetHelpers.BufferOp(OpCode.Spawn);
-        socket.Send(buffer, NetHelpers.MESSAGE_SIZE);
+    private async Task<int> GetLobby() {
+        byte[] buffOut = NetHelpers.BufferOp(OpCode.Queue, 4);
+        await stream.WriteAsync(buffOut, 0, buffOut.Length);
+
+        byte[] buffIn = new byte[4];
+        await stream.ReadAsync(buffIn, 0, buffIn.Length);
+
+        byte op = buffIn[0];
+        if(op == (byte)OpCode.FoundMatch) {
+            UInt16 port = BitConverter.ToUInt16(buffIn, 1);
+            return (int)port;
+        }
+        return -1;
     }
 }

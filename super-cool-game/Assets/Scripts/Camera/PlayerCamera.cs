@@ -16,6 +16,8 @@ public class PlayerCamera : MonoBehaviour {
     private Vector3 velocity = Vector3.zero;
 
     void FixedUpdate() {
+        if (!target) return;
+
         Vector3 endPosition = target.position + offset;
 
         // SmoothDamp seems better than Lerp
