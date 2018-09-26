@@ -20,36 +20,38 @@ public class MultiplayerGame : MonoBehaviour {
         if (NetCode.CmdQueue.Count > 0) {
             lock (NetCode.CmdQueue.SyncRoot) {
                 byte[] buffer = (byte[])NetCode.CmdQueue.Dequeue();
-                Debug.Log("Received command: " + buffer[0]);
+                Debug.Log("Received command: " + Enum.GetName(typeof(OpCode), buffer[0]));
+                int uid = BitConverter.ToUInt16(buffer, 1);
+                GameObject player;
                 switch (buffer[0]) {
                     case (byte)OpCode.Spawn:
-                        var uid = BitConverter.ToUInt16(buffer, 1);
-                        var x = BitConverter.ToSingle(buffer, 3);
-                        var y = BitConverter.ToSingle(buffer, 7);
-                        Spawn(new Vector2(x, y), uid);
+                        var spawnX = BitConverter.ToSingle(buffer, 3);
+                        var spawnY = BitConverter.ToSingle(buffer, 7);
+                        Spawn(new Vector2(spawnX, spawnY), uid);
+                        break;
+                    case (byte)OpCode.Move:
+                        var velX = BitConverter.ToSingle(buffer, 3);
+                        // Get Player with that ID
+                        player = GameObject.Find(uid.ToString());
+                        player.GetComponent<PlayerMovement>().Move(velX);
+                        break;
+                    case (byte)OpCode.Jump:
+                        var jumpHeight = BitConverter.ToSingle(buffer, 3);
+                        player = GameObject.Find(uid.ToString());
+                        player.GetComponent<PlayerMovement>().Jump(jumpHeight);
                         break;
                 }
             }
         }
     }
 
-    public void Connect(int port) {
-        NetCode.socket.Connect(NetCode.SERVER_ADDR, port);
-        NetCode.clientPort = ((IPEndPoint)NetCode.socket.Client.LocalEndPoint).Port;
-
-        // Start listening
-        var udpThread = new Thread(new ThreadStart(NetCode.UdpListener));
-        udpThread.Start();
-
-        byte[] buffer = NetCode.BufferOp(OpCode.Register, 4);
-        NetCode.socket.Send(buffer, buffer.Length);
-    }
-
     private void Spawn(Vector2 pos, int uid) {
         var playerSpawn = Instantiate(playerPrefab, pos, Quaternion.identity);
-        if (uid == NetCode.clientPort) {
+        playerSpawn.name = uid.ToString();
+        if (uid == NetCode.ClientPort) {
             // It's me, attach input and camera
             playerSpawn.AddComponent<PlayerInput>();
+            playerSpawn.AddComponent<PlayerController>();
             cam.GetComponent<PlayerCamera>().target = playerSpawn.transform;
         }
     }

@@ -13,8 +13,7 @@ public class Matchmaker : MonoBehaviour {
         Connect();
         int port = await GetLobby();
         client.Close();
-        var game = gameObject.GetComponent<MultiplayerGame>();
-        game.Connect(port);
+        NetCode.Connect(port);
     }
 
     private void Connect(){
