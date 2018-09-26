@@ -2,7 +2,7 @@
 using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using NetCode;
+using SuperCoolNetwork;
 
 public class Matchmaker : MonoBehaviour {
     TcpClient client;
@@ -13,18 +13,18 @@ public class Matchmaker : MonoBehaviour {
         Connect();
         int port = await GetLobby();
         client.Close();
-        var lobby = gameObject.GetComponent<Lobby>();
-        lobby.Connect(port);
+        var game = gameObject.GetComponent<MultiplayerGame>();
+        game.Connect(port);
     }
 
     private void Connect(){
         client = new TcpClient();
-        client.Connect(NetHelpers.SERVER_ADDR, NetHelpers.MATCHMAKER_PORT);
+        client.Connect(NetCode.SERVER_ADDR, NetCode.MATCHMAKER_PORT);
         stream = client.GetStream();
     }
 
     private async Task<int> GetLobby() {
-        byte[] buffOut = NetHelpers.BufferOp(OpCode.Queue, 4);
+        byte[] buffOut = NetCode.BufferOp(OpCode.Queue, 4);
         await stream.WriteAsync(buffOut, 0, buffOut.Length);
 
         byte[] buffIn = new byte[4];

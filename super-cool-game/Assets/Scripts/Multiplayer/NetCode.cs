@@ -1,4 +1,4 @@
-﻿namespace NetCode {
+﻿namespace SuperCoolNetwork {
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -15,9 +15,12 @@
         SendPos
     }
 
-    public static class NetHelpers {
+    public static class NetCode {
         public const string SERVER_ADDR = "localhost";
         public const int MATCHMAKER_PORT = 50999;
+        public static UdpClient socket = new UdpClient();
+        public static Queue CmdQueue = Queue.Synchronized(new Queue());
+        public static int clientPort;
 
         public static byte[] BufferOp(OpCode op, int size){
             byte[] buffer = new byte[size]; // By default filled with zeroes
@@ -25,9 +28,8 @@
             return buffer;
         }
 
-        public static Queue CmdQueue = Queue.Synchronized(new Queue());
-        public static void UdpListener(UdpClient socket, int port) {
-            IPEndPoint inConn = new IPEndPoint(IPAddress.Any, port);
+        public static void UdpListener() {
+            IPEndPoint inConn = new IPEndPoint(IPAddress.Any, clientPort);
             while (true) {
                 byte[] buffer = socket.Receive(ref inConn);
                 CmdQueue.Enqueue(buffer);
