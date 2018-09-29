@@ -512,10 +512,8 @@ MonoBehaviour:
   - {fileID: 1589089880694286, guid: 578225a64dea43c4683c58a5a7cdc88a, type: 2}
   mapWidth: 0
   mapCenter: {x: 0, y: 0}
-  team1PlacedBlocks: []
-  team2PlacedBlocks: []
-  team1grid: {fileID: 0}
-  team2grid: {fileID: 0}
+  placedBlocks: []
+  grid: {fileID: 0}
 --- !u!4 &534973520
 Transform:
   m_ObjectHideFlags: 0
@@ -831,7 +829,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1480716043}
-        m_MethodName: StartBuilding
+        m_MethodName: ToggleBuilding
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -888,7 +886,6 @@ GameObject:
   - component: {fileID: 1363605360}
   - component: {fileID: 1363605361}
   - component: {fileID: 1363605359}
-  - component: {fileID: 1363605361}
   - component: {fileID: 1363605357}
   - component: {fileID: 1363605362}
   - component: {fileID: 1363605356}

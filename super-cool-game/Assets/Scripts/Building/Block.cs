@@ -38,8 +38,6 @@ public class Block : Object {
         int blockW = BuildingController.blockWidth;
         // Blocks in the grid are in this form
         // ...[-2][-1](center)[1][2]...
-        int x = (int)(Mathf.Sign(position.x) * Mathf.Ceil(Mathf.Abs(position.x) / blockW));
-        Debug.Log(x);
         return new Vector2Int(
             (int)(Mathf.Sign(position.x) * Mathf.Ceil(Mathf.Abs(position.x) / blockW)),
             (int)(Mathf.Sign(position.y) * Mathf.Floor(Mathf.Abs(position.y) / blockW)));

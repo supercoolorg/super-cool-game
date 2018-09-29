@@ -10,6 +10,10 @@ public class PlayerBuilding : MonoBehaviour {
     // Keep track of the 
     public bool isPlaceholderSpanwed = false;
 
+    // CONSTANTS
+    // Import the width of the block from the BC class.
+    private int blockWidth = BuildingController.blockWidth;
+
     // GAMEOBJECTS
     // Import placeholder block to show where the block will be placed
     public GameObject pb;
@@ -26,8 +30,6 @@ public class PlayerBuilding : MonoBehaviour {
                 Mathf.Ceil(transform.position.y / blockWidth) * blockWidth - blockWidth / 2);
         }
     }
-
-    private int blockWidth = BuildingController.blockWidth;
 
     // Update is called once per frame
     void Update() {

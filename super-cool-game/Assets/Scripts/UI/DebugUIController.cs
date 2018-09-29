@@ -12,17 +12,19 @@ public class DebugUIController : MonoBehaviour {
     public Text messageLabel;
 
     private PlayerBuilding pb;
+    private BuildingController bc;
 
     private void Start() {
         pb = player.GetComponent<PlayerBuilding>();
+        bc = FindObjectOfType<BuildingController>();
     }
     public void PlaceBlock() {
         if (pb.isBuilding) {
-            BuildingController.instance.PlaceBlock((int)BlockType.Spawn, pb.SnappedPosition);
+            bc.PlaceBlock((int)BlockType.Spawn, pb.SnappedPosition);
         }
     }
 
-    public void StartBuilding() {
+    public void ToggleBuilding() {
         if (pb.isBuilding) {
             startStopBuildingBtnText.text = "Start Building";
             pb.isBuilding = false;

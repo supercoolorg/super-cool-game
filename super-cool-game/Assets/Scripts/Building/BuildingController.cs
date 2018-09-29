@@ -10,8 +10,8 @@ using UnityEngine;
 // Return a numerical value for each kind of block.
 // </summary>
 enum BlockType {
-    Spawn = 0,
-    Heal = 1
+    Spawn,
+    Heal
 }
 
 public class BuildingController : MonoBehaviour {
@@ -53,7 +53,7 @@ public class BuildingController : MonoBehaviour {
     [HideInInspector] public GameObject grid;
 
     void Start() {
-        Vector2 groundSize = ground.transform.GetComponent<SpriteRenderer>().bounds.size;
+        Vector2 groundSize = ground.GetComponent<SpriteRenderer>().bounds.size;
 
         // Get width of the sprite rendered as ground.
         mapWidth = groundSize.x;
@@ -61,32 +61,12 @@ public class BuildingController : MonoBehaviour {
         // Calculate center of the map
         mapCenter = new Vector2(ground.transform.position.x, ground.transform.position.y + (groundSize.y / 2));
 
-        // Spawn two empty gameObjects.
-        // Blocks must be children of these two.
-
-        // TODO: Find why unity spawns two gameobjects, Block Grid and Block Grid (clone).
+        // Spawn a empty gameObject which will be
+        // the parent of the placed blocks.
+        // Blocks must be children of this one.
         grid = new GameObject();
         grid.name = "Block Grid";
-        grid = Instantiate(grid, mapCenter, Quaternion.identity);
-    }
-
-    // <summary>
-    // Create a singleton to call functions without instancing the class directly
-    // </summary>
-    private static BuildingController _instance = null;
-
-    public static BuildingController instance {
-        get {
-            // If there is no instance, find one.
-            if (_instance == null) {
-                // Find an already setted instance of BC
-                _instance = FindObjectOfType(typeof(BuildingController)) as BuildingController;
-            }
-            // In theory, if there isnt one you should create it, but since it's right there in the
-            // editor, we can avoid to do that.
-
-            return _instance;
-        }
+        grid.transform.position = mapCenter;
     }
 
     // <summary>
@@ -95,20 +75,16 @@ public class BuildingController : MonoBehaviour {
     // </summary>
     // It should be the server to decide where and when place the block.
     public void PlaceBlock(int type, Vector2 position) {
-
-        // TODO: Check if there isnt already a block there.
         // If there's no block in that position, create a new one.
         if (!placedBlocks.Exists(
             x => x.position == Block.GetBlockRelativeCoordinates(position)
             )) {
             // Spawn the block
-            GameObject go = Instantiate(blocks[type], position, Quaternion.identity);
-            go.transform.parent = grid.transform;
-
-
+            GameObject block = Instantiate(blocks[type], position, Quaternion.identity);
+            block.transform.parent = grid.transform;
 
             // Add the block to the list for checks and reference.
-            placedBlocks.Add(new Block(type, position, go));
+            placedBlocks.Add(new Block(type, position, block));
         } else {
             Debug.Log("A block is already present in that position, can't place a block there!");
         }
