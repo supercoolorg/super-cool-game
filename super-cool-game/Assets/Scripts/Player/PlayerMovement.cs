@@ -4,13 +4,14 @@ public class PlayerMovement : MonoBehaviour {
     /* Translates commands from PlayerController into movement */
 
     private Rigidbody2D rb;
-    private float checkGroundDistance = 1f;
+    private BoxCollider2D boxCollider;
     private float velX = 0;
 
     // Use this for initialization
     void Start() {
         // Get Rigidbody from the GameObject
-        rb = gameObject.GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
     }
     
     void FixedUpdate() {
@@ -30,13 +31,11 @@ public class PlayerMovement : MonoBehaviour {
     // Uses a raycast to check if player is grounded
     public bool IsGrounded {
         get {
-            Vector2 position = transform.position;
+            Vector2 origin = transform.position + Vector3.down * boxCollider.size.y;
             Vector2 direction = Vector2.down;
 
-            RaycastHit2D hit = Physics2D.Raycast(position, direction, checkGroundDistance);
-            if (hit.collider != null)
-                return true;
-            return false;
+            RaycastHit2D hit = Physics2D.Raycast(origin, direction, 0.1f);
+            return hit.collider != null;
         }
     }
 }
