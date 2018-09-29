@@ -5,17 +5,17 @@ public class PlayerMovement : MonoBehaviour {
 
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider;
-    private float velX = 0;
 
-    // Use this for initialization
+    private float friction = 0.4f;
+    private float velX = 0;
+    
     void Start() {
-        // Get Rigidbody from the GameObject
         rb = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
     }
     
     void FixedUpdate() {
-        rb.velocity = new Vector2(velX, rb.velocity.y);
+        rb.velocity = new Vector2(ApplyFriction(velX), rb.velocity.y);
     }
 
     public void Jump (float velY) {
@@ -37,5 +37,16 @@ public class PlayerMovement : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(origin, direction, 0.1f);
             return hit.collider != null;
         }
+    }
+    
+    private float ApplyFriction(float vel) {
+        if (!IsGrounded) return vel;
+
+        if (vel > 0)
+            vel = Mathf.Max(0, vel - friction);
+        else if (vel < 0)
+            vel = Mathf.Min(0, vel + friction);
+
+        return vel;
     }
 }
