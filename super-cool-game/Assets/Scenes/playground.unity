@@ -198,7 +198,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 81391355}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: fb2920345b08e3345b9abfad726b4f9c, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -344,6 +344,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1363605358}
   - component: {fileID: 1363605360}
+  - component: {fileID: 1363605361}
   - component: {fileID: 1363605359}
   - component: {fileID: 1363605357}
   - component: {fileID: 1363605356}
@@ -355,21 +356,31 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!70 &1363605355
-CapsuleCollider2D:
+--- !u!61 &1363605355
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1363605354}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: fb2920345b08e3345b9abfad726b4f9c, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.022335658}
-  m_Size: {x: 0.64, y: 0.7708487}
-  m_Direction: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.64, y: 0.64}
+    newSize: {x: 0.64, y: 0.64}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.64, y: 0.64}
+  m_EdgeRadius: 0
 --- !u!50 &1363605356
 Rigidbody2D:
   serializedVersion: 4
@@ -382,10 +393,10 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0.7
-  m_AngularDrag: 0.05
+  m_LinearDrag: 0
+  m_AngularDrag: 0
   m_GravityScale: 1.5
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: fb2920345b08e3345b9abfad726b4f9c, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -471,13 +482,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98852ab996a1ef54bb8bc3836b0092b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
-  maxSpeed: 9
-  jumpHeight: 6
-  checkGroundDistance: 1
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
+--- !u!114 &1363605361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1363605354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66e6ade5b2fe9594c9dfde4bce5ddc6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1854689413
 GameObject:
   m_ObjectHideFlags: 0

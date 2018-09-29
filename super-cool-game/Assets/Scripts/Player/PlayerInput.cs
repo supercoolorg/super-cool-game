@@ -3,24 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerInput : MonoBehaviour {
-    // Player Input handles the control of the player's character
-    // on the client machine.
+    /* Handles user inputs, to be sent over to PlayerController */
 
-    // This one is imported from PlayerMovement.cs, so dont touch it.
-    private PlayerMovement pm;
+    private PlayerController controller;
 
     void Start() {
-        // Get speed from PlayerMovement.cs
-        pm = gameObject.GetComponent<PlayerMovement>();
+        controller = gameObject.GetComponent<PlayerController>();
     }
-    // Update is called once per frame
+    
     void Update () {
         // Player wants to move laterally
-        pm.Move(Input.GetAxis("Horizontal"));
+        controller.Move(Input.GetAxis("Horizontal"));
 
         // Player wants to jumpy
-        if(Input.GetButtonDown("Jump")) {
-            pm.Jump();
+        if (Input.GetButtonDown("Jump")) {
+            controller.Jump();
         }
 	}
 }
