@@ -17,11 +17,8 @@ public class DebugUIController : MonoBehaviour {
         pb = player.GetComponent<PlayerBuilding>();
     }
     public void PlaceBlock() {
-        Debug.Log(pb.isBuilding);
-
         if (pb.isBuilding) {
             BuildingController.instance.PlaceBlock((int)BlockType.Spawn, pb.SnappedPosition);
-            Debug.Log("Placing a block at " + pb.SnappedPosition);
         }
     }
 

@@ -19,29 +19,27 @@ public class Building : Editor {
         // Title label
         EditorGUILayout.LabelField("Grid Type Representation");
 
+        IEnumerable<Block> sortedBlocks = from b in bg.placedBlocks
+                                          orderby b.position.y, b.position.x ascending
+                                          select b;
+
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, false, GUILayout.Height(150));
 
-        //for (int i = 0; i < sortedGrid1.Count; i += 3) {
-        //    // The output
-        //    string res = "";
 
-        //    // TODO: Test it correctly with values
-        //    for (int j = 0; j < 3; j++) {
-        //        Block b1 = sortedGrid1[i + j];
-        //        res += "[" + b1.type + "] ";
-        //    }
-
-        //    // Add spacing
-        //    res += "....... ";
-
-        //    // Not so sure about this
-        //    for (int j = 2; j >= 0; j--) {
-        //        Block b2 = sortedGrid2[i + j];
-        //        res += "[" + b2.type + "] ";
-        //    }
-
-        //    EditorGUILayout.LabelField(res);
-        //}
+        int y = 0;
+        string output = "";
+        foreach (var b in sortedBlocks) {
+            // If the row is the same, just add the block
+            if (y == b.position.y) {
+                output += "[" + b.type + "| " + b.position.x + ", " + y + "]";
+            } else {
+                // print the previous row and reset and start the next
+                EditorGUILayout.LabelField(output);
+                output = "[" + b.type + "| " + b.position.x + ", " + y + "]";
+                y = b.position.y;
+            }
+        }
+        EditorGUILayout.LabelField(output);
 
         EditorGUILayout.EndScrollView();
 

@@ -33,7 +33,8 @@ public class BuildingController : MonoBehaviour {
     // Debug Tools
     public bool showDebugGrid = false;
 
-    // Assign gameObjects to be addressable by code
+    // Assign gameObjects in EDITOR
+    // to be used in code.
     public GameObject[] blocks;
 
     // HIDDEN IN INSPECTOR
@@ -44,12 +45,12 @@ public class BuildingController : MonoBehaviour {
     [HideInInspector] public Vector2 mapCenter;
 
     // Reference grid of block gameobjects
-    [HideInInspector] public List<GameObject> team1PlacedBlocks = new List<GameObject>();
-    [HideInInspector] public List<GameObject> team2PlacedBlocks = new List<GameObject>();
+    // this is DATA
+    [HideInInspector] public List<Block> placedBlocks = new List<Block>();
 
     // Container for blocks in world space, in order to have relative positioning
-    [HideInInspector] public GameObject team1grid;
-    [HideInInspector] public GameObject team2grid;
+    // this is GAMEOBJECTS
+    [HideInInspector] public GameObject grid;
 
     void Start() {
         Vector2 groundSize = ground.transform.GetComponent<SpriteRenderer>().bounds.size;
@@ -62,8 +63,11 @@ public class BuildingController : MonoBehaviour {
 
         // Spawn two empty gameObjects.
         // Blocks must be children of these two.
-        team1grid = Instantiate(new GameObject(), new Vector2(mapCenter.x - blockWidth * 2, mapCenter.y), Quaternion.identity);
-        team2grid = Instantiate(new GameObject(), new Vector2(mapCenter.x + blockWidth * 2, mapCenter.y), Quaternion.identity);
+
+        // TODO: Find why unity spawns two gameobjects, Block Grid and Block Grid (clone).
+        grid = new GameObject();
+        grid.name = "Block Grid";
+        grid = Instantiate(grid, mapCenter, Quaternion.identity);
     }
 
     // <summary>
@@ -73,13 +77,13 @@ public class BuildingController : MonoBehaviour {
 
     public static BuildingController instance {
         get {
+            // If there is no instance, find one.
             if (_instance == null) {
                 // Find an already setted instance of BC
                 _instance = FindObjectOfType(typeof(BuildingController)) as BuildingController;
-            } else {
-                // Remind that you should never destroy GameManager gameObject.
-                Debug.Log("There isn't an instance of BuildingController! Has the GameManager object been deleted by mistake?");
             }
+            // In theory, if there isnt one you should create it, but since it's right there in the
+            // editor, we can avoid to do that.
 
             return _instance;
         }
@@ -93,31 +97,21 @@ public class BuildingController : MonoBehaviour {
     public void PlaceBlock(int type, Vector2 position) {
 
         // TODO: Check if there isnt already a block there.
-        // Spawn the block
-        GameObject go = Instantiate(blocks[type], position, Quaternion.identity);
-        go.transform.parent = GetTeamGrid(1).transform;
+        // If there's no block in that position, create a new one.
+        if (!placedBlocks.Exists(
+            x => x.position == Block.GetBlockRelativeCoordinates(position)
+            )) {
+            // Spawn the block
+            GameObject go = Instantiate(blocks[type], position, Quaternion.identity);
+            go.transform.parent = grid.transform;
 
-        GetTeamBlocks(1).Add(go);
-    }
 
-    // Return the list of placed blocks
-    public List<GameObject> GetTeamBlocks(int teamId) {
-        if (teamId == 1) {
-            return team1PlacedBlocks;
-        } else if (teamId == 2) {
-            return team2PlacedBlocks;
+
+            // Add the block to the list for checks and reference.
+            placedBlocks.Add(new Block(type, position, go));
+        } else {
+            Debug.Log("A block is already present in that position, can't place a block there!");
         }
-        return null;
-    }
-
-    // Return the root gameobject of 
-    public GameObject GetTeamGrid(int teamId) {
-        if (teamId == 1) {
-            return team1grid;
-        } else if (teamId == 2) {
-            return team2grid;
-        }
-        return null;
     }
 
     // DEBUG UTILITIES
