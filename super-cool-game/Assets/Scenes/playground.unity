@@ -344,6 +344,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1363605358}
   - component: {fileID: 1363605360}
+  - component: {fileID: 1363605361}
   - component: {fileID: 1363605359}
   - component: {fileID: 1363605357}
   - component: {fileID: 1363605356}
@@ -471,9 +472,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98852ab996a1ef54bb8bc3836b0092b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1363605361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1363605354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66e6ade5b2fe9594c9dfde4bce5ddc6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   speed: 3
-  maxSpeed: 9
-  jumpHeight: 6
+  jumpHeight: 7
   checkGroundDistance: 1
   groundLayer:
     serializedVersion: 2
