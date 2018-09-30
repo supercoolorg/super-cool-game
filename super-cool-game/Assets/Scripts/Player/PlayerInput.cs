@@ -13,7 +13,7 @@ public class PlayerInput : MonoBehaviour {
     
     void Update () {
         // Player wants to move laterally
-        controller.Move(Input.GetAxis("Horizontal"));
+        controller.Move(Input.GetAxisRaw("Horizontal"));
 
         // Player wants to jumpy
         if (Input.GetButtonDown("Jump")) {
