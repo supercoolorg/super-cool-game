@@ -5,75 +5,104 @@ using UnityEngine.UI;
 
 public class PlayerUI : MonoBehaviour {
 
-	public Image iconStructural;
-	public Image iconPowerUps;
-	public Image iconSpecial;
+	
+	// Player to follow
+	public GameObject player;
 
-	public GameObject panel;
-	public GameObject blockImage;
+	// Get sprite for circular container of picker UI
+	public GameObject ui_circ;
 
-	private List<GameObject> blockImages = new List<GameObject>();
+	// Get image prototype to replicate
+	public GameObject ui_icon;
 
-	// DEBUG
-	public int blocks;
+	// Set sprite offset relative to player
+	public Vector3 offset = new Vector3(0, 20, 0);
 
-	// Keep track of the selected block to place
-	int selectedElem = 0;
+	[HideInInspector] public bool isPickerUIActive;
+
+	// List of block images to show on UI
+	private List<GameObject> icons = new List<GameObject>();
+
+	// The canvas container
+	private GameObject canvas;
+
+	// Used for Lerp
+	// How many seconds to complete the animation
+	private float ui_circSpeed = 0.1f;
+
+	// Goes from 0 to 1, where 1 is ui_circSpeed [seconds]
+	private float ui_circT = 0; 
+
+	private float ui_circRadius;
 
 	void Start () {
 		// Shall we forget to assing the panel, Unity'll try to find it.
-		if(panel == null) {
-			panel = GameObject.Find("/PlayerUICanvas/Canvas/Panel");
+		if(canvas == null) {
+			canvas = GameObject.Find("/PlayerUICanvas/Canvas");
 		}
 
-		Init();
-	}
-
-	public void Init() {
-		for (int i = 0; i < blocks; i++) {
-			GameObject newImage = Instantiate(blockImage, panel.transform);
-			newImage.transform.position += new Vector3(45 * i, 0, 0);
-
-			blockImages.Add(newImage);
+		// Same as before, find the object if not assigned.
+		if(ui_circ == null) {
+			ui_circ = GameObject.Find("/PlayerUICanvas/Canvas/CircularBackground");
 		}
-		Destroy(blockImage);
+
+		// Hide it
+		ui_circ.transform.localScale = Vector3.zero;
+
+		// Calculate the radius
+		ui_circRadius = Vector3.Distance(ui_icon.transform.position, ui_circ.transform.position);
+
+		for (int i = 0; i < 8; i++) {
+			GameObject icon = Instantiate(ui_icon, ui_circ.transform);
+			icon.name = "Icon_" + i;
+			icons.Add(icon);
+		}
+		Debug.Log(ui_circRadius);
+		Destroy(ui_icon);
 	}
 
-	public void ScrollLeft() {
-		// translate every element to the left
-		if(selectedElem < blockImages.Count - 1) {
-			// move each block to the left
-			foreach (var block in blockImages){
-				Vector3 startPos = block.transform.position;
-				block.transform.position = startPos + new Vector3(-45, 0, 0);
-			}
-			selectedElem += 1;
-			ScaleBlocks();
+	// Show circular container
+	public void ShowPickerUI() {
+		// Increase the % of the animation
+		ui_circT += Time.deltaTime;
+
+		// Show the circular background
+		ui_circ.transform.localScale = Vector2.Lerp(
+			Vector2.zero,
+			new Vector2(1, 1),
+			ui_circT / ui_circSpeed
+		);
+
+		// Set its position on UI based to player position in world.
+		ui_circ.transform.position = Camera.main.WorldToScreenPoint(player.transform.position + offset);
+
+		UpdatePickerUIElements();
+	}
+
+	// Hide circular container
+	public void HidePickerUI() {
+		// Reset the progress on the animation
+		ui_circT = 0;
+		// Show the circular background
+		ui_circ.transform.localScale = Vector2.zero;
+	}
+
+	public void UpdatePickerUIElements() {
+		for (int i = 0; i < 8; i++) {
+				float angle = Mathf.PI/4 * i;
+				float posX = Mathf.Cos(angle) * ui_circRadius;
+				float posY = Mathf.Sin(angle) * ui_circRadius;
+				
+				icons[i].transform.position = ui_circ.transform.position 
+					+ new Vector3(posX, posY, 0);
 		}
 	}
 
-	public void ScrollRight() {
-		// translate every element to the right
-		if(selectedElem > 0) {
-			// move each block to the right
-			foreach (var block in blockImages){
-				Vector3 startPos = block.transform.position;
-				block.transform.position = startPos + new Vector3(45, 0, 0);
-			}
-			selectedElem -= 1;
-			ScaleBlocks();
-		}
-	}
-
-	private void ScaleBlocks() {
-		for (int i = 0; i < blockImages.Count; i++) {
-			// If it's not the central block, scale it down
-			if(selectedElem != i) {
-				blockImages[i].transform.localScale = new Vector3(1,1,0);
-			} else {
-				// Scale it up by 0.1
-				blockImages[i].transform.localScale += new Vector3(0.1f, 0.1f, 0);
-			}
+	void Update() {
+		if(isPickerUIActive) {
+			ShowPickerUI();
+		} else {
+			HidePickerUI();
 		}
 	}
 }

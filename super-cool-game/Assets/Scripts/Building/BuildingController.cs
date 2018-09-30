@@ -48,6 +48,7 @@ public class BuildingController : MonoBehaviour {
         // Spawn grid container game object
         gridContainer = new GameObject();
         gridContainer.name = "Grid";
+        gridContainer.transform.position += new Vector3(0, 0, 2);
     }
 
     // EDITING THE GRID
@@ -62,10 +63,10 @@ public class BuildingController : MonoBehaviour {
         // Choose where to spawn the block
         // As example, I'll use the player position.
         // Later, it should be the server to choose it.
-        newBlock.transform.position = new Vector2(
+        newBlock.transform.position = new Vector3(
             newBlockData.position.x * blockWidth - Mathf.Sign(newBlockData.position.x) * blockWidth / 2,
-            newBlockData.position.y * blockWidth - blockWidth / 2 + mapCenter.y
-        );
+            newBlockData.position.y * blockWidth - blockWidth / 2 + mapCenter.y,
+            2);
         ResizeBlock(newBlock);
         newBlock.transform.parent = gridContainer.transform;
     }
