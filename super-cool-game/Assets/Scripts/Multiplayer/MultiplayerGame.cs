@@ -23,22 +23,20 @@ public class MultiplayerGame : MonoBehaviour {
                 Debug.Log("Received command: " + Enum.GetName(typeof(OpCode), buffer[0]));
                 int uid = BitConverter.ToUInt16(buffer, 1);
                 GameObject player;
+                Rigidbody2D rb;
                 switch (buffer[0]) {
                     case (byte)OpCode.Spawn:
                         var spawnX = BitConverter.ToSingle(buffer, 3);
                         var spawnY = BitConverter.ToSingle(buffer, 7);
                         Spawn(new Vector2(spawnX, spawnY), uid);
                         break;
-                    case (byte)OpCode.Move:
-                        var velX = BitConverter.ToSingle(buffer, 3);
-                        // Get Player with that ID
+                    case (byte)OpCode.SetPos:
                         player = GameObject.Find(uid.ToString());
-                        player.GetComponent<PlayerMovement>().Move(velX);
-                        break;
-                    case (byte)OpCode.Jump:
-                        var jumpHeight = BitConverter.ToSingle(buffer, 3);
-                        player = GameObject.Find(uid.ToString());
-                        player.GetComponent<PlayerMovement>().Jump(jumpHeight);
+                        rb = player.GetComponent<Rigidbody2D>();
+                        Vector2 finish = new Vector2(BitConverter.ToSingle(buffer, 3), BitConverter.ToSingle(buffer, 7));
+                        Vector2 delta = finish - rb.position;
+                        player.GetComponent<PlayerMovement>().MoveX(delta.x / Time.fixedDeltaTime);
+                        player.GetComponent<PlayerMovement>().MoveY(delta.y / Time.fixedDeltaTime);
                         break;
                 }
             }
@@ -54,12 +52,5 @@ public class MultiplayerGame : MonoBehaviour {
             playerSpawn.AddComponent<PlayerController>();
             cam.GetComponent<PlayerCamera>().target = playerSpawn.transform;
         }
-    }
-
-    private void SendPos(Vector2 pos) {
-        byte[] buffer = NetCode.BufferOp(OpCode.SendPos, 11);
-        Buffer.BlockCopy(BitConverter.GetBytes(pos.x), 0, buffer, 3, 4);
-        Buffer.BlockCopy(BitConverter.GetBytes(pos.y), 0, buffer, 7, 4);
-        NetCode.socket.Send(buffer, buffer.Length);
     }
 }

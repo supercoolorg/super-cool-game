@@ -14,7 +14,6 @@ public class PlayerMovement : MonoBehaviour {
     }
     
     void FixedUpdate() {
-        rb.velocity = new Vector2(ApplyFriction(velX), rb.velocity.y);
     }
 
     public void Jump (float velY) {
@@ -23,10 +22,14 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     // Moves the player on the X axis
-    public void Move (float velX) {
-        this.velX = velX;
+    public void MoveX (float velX) {
+        rb.velocity = new Vector2(velX, rb.velocity.y);
     }
-    
+
+    public void MoveY(float velY) {
+        rb.velocity = new Vector2(rb.velocity.x, velY);
+    }
+
     public bool IsGrounded {
         get { return touchingColliders > 0;  }
         private set { }
