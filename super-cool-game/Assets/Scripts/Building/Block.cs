@@ -21,7 +21,7 @@ public class Block : Object {
 		this.type = type;
 		this.position = new Vector2Int(
 			(int)(Mathf.Sign(position.x) * Mathf.Ceil(Mathf.Abs(position.x / blockWidth))),
-			(int)(Mathf.Sign(position.y) * Mathf.Ceil(Mathf.Abs(position.y / blockWidth)))
+			(int)Mathf.Ceil(Mathf.Abs(position.y / blockWidth))
 		);
 		this.reference = reference;
 	}
