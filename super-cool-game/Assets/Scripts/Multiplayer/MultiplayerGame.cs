@@ -1,8 +1,5 @@
 ﻿using SuperCoolNetwork;
 using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
 using UnityEngine;
 
 public class MultiplayerGame : MonoBehaviour {
@@ -14,29 +11,50 @@ public class MultiplayerGame : MonoBehaviour {
         
     }
 
-    // Update is called once per frame
-    void Update() {
-        // Process UDP packets
-        if (NetCode.CmdQueue.Count > 0) {
+    // FixedUpdate is called at a constant rate
+    void FixedUpdate() {
+        // Only process 1 SetPos command per FixedUpdate
+        bool processedPos = false;
+        int skipCommands = 0;
+
+        while (NetCode.CmdQueue.Count - skipCommands > 0) {
             lock (NetCode.CmdQueue.SyncRoot) {
                 byte[] buffer = (byte[])NetCode.CmdQueue.Dequeue();
-                Debug.Log("Received command: " + Enum.GetName(typeof(OpCode), buffer[0]));
-                int uid = BitConverter.ToUInt16(buffer, 1);
+
+                // Shared variables for the following cases
+                int uid;
                 GameObject player;
                 Rigidbody2D rb;
+
                 switch (buffer[0]) {
                     case (byte)OpCode.Spawn:
+                        uid = BitConverter.ToUInt16(buffer, 1);
                         var spawnX = BitConverter.ToSingle(buffer, 3);
                         var spawnY = BitConverter.ToSingle(buffer, 7);
                         Spawn(new Vector2(spawnX, spawnY), uid);
                         break;
                     case (byte)OpCode.SetPos:
-                        player = GameObject.Find(uid.ToString());
-                        rb = player.GetComponent<Rigidbody2D>();
-                        Vector2 finish = new Vector2(BitConverter.ToSingle(buffer, 3), BitConverter.ToSingle(buffer, 7));
-                        Vector2 delta = finish - rb.position;
-                        player.GetComponent<PlayerMovement>().MoveX(delta.x / Time.fixedDeltaTime);
-                        player.GetComponent<PlayerMovement>().MoveY(delta.y / Time.fixedDeltaTime);
+                        // Only process 1 SetPos command per FixedUpdate
+                        if (processedPos) {
+                            NetCode.CmdQueue.Enqueue(buffer);
+                            skipCommands++;
+                            break;
+                        }
+
+                        int n = (buffer.Length - 1) / 10;
+                        for (int i = 0; i < n; i++) {
+                            uid = BitConverter.ToUInt16(buffer, 1 + i * 10);
+                            player = GameObject.Find(uid.ToString());
+                            rb = player.GetComponent<Rigidbody2D>();
+                            Vector2 finish = new Vector2(
+                                BitConverter.ToSingle(buffer, 3 + i * 10),
+                                BitConverter.ToSingle(buffer, 7 + i * 10));
+                            Vector2 delta = finish - rb.position;
+                            player.GetComponent<PlayerMovement>().MoveX(delta.x / Time.fixedDeltaTime);
+                            player.GetComponent<PlayerMovement>().MoveY(delta.y / Time.fixedDeltaTime);
+                            rb.velocity = delta / Time.fixedDeltaTime;
+                        }
+                        processedPos = true;
                         break;
                 }
             }

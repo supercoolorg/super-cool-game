@@ -35,7 +35,9 @@
             IPEndPoint inConn = new IPEndPoint(IPAddress.Any, ClientPort);
             while (true) {
                 byte[] buffer = socket.Receive(ref inConn);
-                CmdQueue.Enqueue(buffer);
+                lock (CmdQueue.SyncRoot) {
+                    CmdQueue.Enqueue(buffer);
+                }
             }
         }
 
