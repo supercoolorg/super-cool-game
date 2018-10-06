@@ -7,34 +7,39 @@ public class PlayerMovement : MonoBehaviour {
     private BoxCollider2D groundTrigger;
 
     private float friction = 0.4f;
-    private float velX = 0;
-    
+    private float velX = 0, velY = 0;
+
     void Start() {
         rb = GetComponent<Rigidbody2D>();
     }
-    
+
     void FixedUpdate() {
+        if (!IsGrounded) {
+            // Apply gravity
+            velY -= 9.81f * 1.5f * Time.fixedDeltaTime;
+        }
+        rb.velocity = new Vector2(velX, velY);
     }
 
-    public void Jump (float velY) {
-        if(IsGrounded)
-            rb.velocity = new Vector2(rb.velocity.x, velY);
+    public void Jump(float velY) {
+        if (IsGrounded)
+            this.velY = velY;
     }
 
     // Moves the player on the X axis
-    public void MoveX (float velX) {
-        rb.velocity = new Vector2(velX, rb.velocity.y);
+    public void MoveX(float velX) {
+        this.velX = velX;
     }
 
     public void MoveY(float velY) {
-        rb.velocity = new Vector2(rb.velocity.x, velY);
+        this.velY = velY;
     }
 
     public bool IsGrounded {
-        get { return touchingColliders > 0;  }
+        get { return touchingColliders > 0; }
         private set { }
     }
-    
+
     private float ApplyFriction(float vel) {
         if (!IsGrounded) return vel;
 
