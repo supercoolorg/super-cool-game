@@ -23,16 +23,15 @@ public class MultiplayerGame : MonoBehaviour {
 
                 // Shared variables for the following cases
                 int uid;
-                GameObject player;
-                Rigidbody2D rb;
 
                 switch (buffer[0]) {
                     case (byte)OpCode.Spawn:
                         uid = BitConverter.ToUInt16(buffer, 1);
                         var spawnX = BitConverter.ToSingle(buffer, 3);
                         var spawnY = BitConverter.ToSingle(buffer, 7);
-                        Spawn(new Vector2(spawnX, spawnY), uid);
+                        Spawn(uid, new Vector2(spawnX, spawnY));
                         break;
+
                     case (byte)OpCode.SetPos:
                         // Only process 1 SetPos command per FixedUpdate
                         if (processedPos) {
@@ -44,15 +43,10 @@ public class MultiplayerGame : MonoBehaviour {
                         int n = (buffer.Length - 1) / 10;
                         for (int i = 0; i < n; i++) {
                             uid = BitConverter.ToUInt16(buffer, 1 + i * 10);
-                            player = GameObject.Find(uid.ToString());
-                            rb = player.GetComponent<Rigidbody2D>();
-                            Vector2 finish = new Vector2(
+                            Vector2 pos = new Vector2(
                                 BitConverter.ToSingle(buffer, 3 + i * 10),
                                 BitConverter.ToSingle(buffer, 7 + i * 10));
-                            Vector2 delta = finish - rb.position;
-                            player.GetComponent<PlayerMovement>().MoveX(delta.x / Time.fixedDeltaTime);
-                            player.GetComponent<PlayerMovement>().MoveY(delta.y / Time.fixedDeltaTime);
-                            rb.velocity = delta / Time.fixedDeltaTime;
+                            MovePlayer(uid, pos);
                         }
                         processedPos = true;
                         break;
@@ -61,7 +55,7 @@ public class MultiplayerGame : MonoBehaviour {
         }
     }
 
-    private void Spawn(Vector2 pos, int uid) {
+    private void Spawn(int uid, Vector2 pos) {
         var playerSpawn = Instantiate(playerPrefab, pos, Quaternion.identity);
         playerSpawn.name = uid.ToString();
         if (uid == NetCode.ClientPort) {
@@ -70,5 +64,15 @@ public class MultiplayerGame : MonoBehaviour {
             playerSpawn.AddComponent<PlayerController>();
             cam.GetComponent<PlayerCamera>().target = playerSpawn.transform;
         }
+    }
+
+    private void MovePlayer(int uid, Vector2 pos) {
+        GameObject player = GameObject.Find(uid.ToString());
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        PlayerMovement pm = player.GetComponent<PlayerMovement>();
+
+        Vector2 delta = pos - rb.position;
+        pm.MoveX(delta.x / Time.fixedDeltaTime);
+        pm.MoveY(delta.y / Time.fixedDeltaTime);
     }
 }
