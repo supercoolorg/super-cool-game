@@ -14,7 +14,8 @@
         Spawn,
         Move,
         Jump,
-        SetPos
+        SetPos,
+        Disconnect
     }
 
     public static class NetCode {

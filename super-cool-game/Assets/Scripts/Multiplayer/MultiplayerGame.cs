@@ -50,6 +50,11 @@ public class MultiplayerGame : MonoBehaviour {
                         }
                         processedPos = true;
                         break;
+
+                    case (byte)OpCode.Disconnect:
+                        uid = BitConverter.ToUInt16(buffer, 1);
+                        Destroy(GameObject.Find(uid.ToString()));
+                        break;
                 }
             }
         }
@@ -74,5 +79,13 @@ public class MultiplayerGame : MonoBehaviour {
         Vector2 delta = pos - rb.position;
         pm.MoveX(delta.x / Time.fixedDeltaTime);
         pm.MoveY(delta.y / Time.fixedDeltaTime);
+    }
+
+    private void OnDestroy() {
+        // Send to network
+        if (NetCode.IsConnected) {
+            byte[] buffer = NetCode.BufferOp(OpCode.Disconnect, 1);
+            NetCode.socket.Send(buffer, buffer.Length);
+        }
     }
 }
