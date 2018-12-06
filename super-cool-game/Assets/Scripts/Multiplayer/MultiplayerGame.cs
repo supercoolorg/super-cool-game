@@ -55,6 +55,11 @@ public class MultiplayerGame : MonoBehaviour {
                         uid = BitConverter.ToUInt16(buffer, 1);
                         Destroy(GameObject.Find(uid.ToString()));
                         break;
+
+                    case (byte)OpCode.Ping:
+                        uid = BitConverter.ToUInt16(buffer, 1);
+                        GameObject.Find(uid.ToString()).GetComponent<Ping>().Pong();
+                        break;
                 }
             }
         }
@@ -67,6 +72,7 @@ public class MultiplayerGame : MonoBehaviour {
             // It's me, attach input and camera
             playerSpawn.AddComponent<PlayerInput>();
             playerSpawn.AddComponent<PlayerController>();
+            playerSpawn.AddComponent<Ping>();
             cam.GetComponent<PlayerCamera>().target = playerSpawn.transform;
         }
     }
