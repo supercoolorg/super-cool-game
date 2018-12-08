@@ -5,6 +5,7 @@ using UnityEngine;
 public class BuildingController : MonoBehaviour {
     // DEBUG
     public bool showDebugGrid;
+    public bool isBuilding;
 
     // Set block width
     public int blockWidth = 4;
@@ -27,12 +28,20 @@ public class BuildingController : MonoBehaviour {
     // Import Prefabs to spawn them in-game
     public GameObject[] blocks;
 
+    // Utility
     [HideInInspector] public float mapWidth;
     [HideInInspector] public Vector2 mapCenter;
+    
+    // Player position
+    private GameObject player;
+
+    // Block Placement Preview
+    private GameObject previewBlock = null;
 
     // The grid data reference
     private List<Block> grid = new List<Block>();
 
+    // The parent gameobject
     private GameObject gridContainer;
     
     void Start() {
@@ -48,6 +57,8 @@ public class BuildingController : MonoBehaviour {
         // Spawn grid container game object
         gridContainer = new GameObject();
         gridContainer.name = "Grid";
+        
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     // EDITING THE GRID
@@ -60,8 +71,7 @@ public class BuildingController : MonoBehaviour {
         grid.Add(newBlockData);
 
         // Choose where to spawn the block
-        // As example, I'll use the player position.
-        // Later, it should be the server to choose it.
+        // it should be the server to choose it.
         newBlock.transform.position = new Vector2(
             newBlockData.position.x * blockWidth - Mathf.Sign(newBlockData.position.x) * blockWidth / 2,
             newBlockData.position.y * blockWidth - blockWidth / 2 + mapCenter.y
@@ -96,6 +106,38 @@ public class BuildingController : MonoBehaviour {
         block.transform.localScale = newScale;
     }
 
+    private void PreviewBlock(int type, Vector2 position) {
+        // If there isn't a preview block, create it.
+        if(previewBlock == null) {
+            // Create a new gameObject
+            previewBlock = Object.Instantiate(blocks[type]);
+            previewBlock.name = "Preview Block";
+            previewBlock.transform.parent = gridContainer.transform;
+
+            // Put it in the background
+            previewBlock.transform.position -= new Vector3(0, 0, 2);
+
+            ResizeBlock(previewBlock);
+
+            // Give the block a light blue shade.
+            SpriteRenderer sr = previewBlock.GetComponent<SpriteRenderer>();
+            sr.color = new Color(0.505f, 0.796f, 0.952f, 0.5f);
+        }
+
+        // In blocks with x=0 there is a little glitch, but we'll never
+        // place blocks in 0 (center of the map), ok?
+        Vector2 endPos = new Vector2(
+            blockWidth * (Mathf.Ceil(position.x / blockWidth) - 0.5f),
+            blockWidth * (Mathf.Ceil(Mathf.Abs(position.y / blockWidth)) - 0.5f) + mapCenter.y
+        );
+
+        // 4 is lerp speed. It's fast enough to feel smooth.
+        previewBlock.transform.position = Vector2.Lerp(
+            previewBlock.transform.position,
+            endPos, 
+            Time.deltaTime * 6);
+    }
+
     // DEBUG
     void DebugDrawGrid () {
         int b_gridHalfWidth = b_gridTeamWidth + b_gridTeamGapWidth;
@@ -117,5 +159,11 @@ public class BuildingController : MonoBehaviour {
     private void Update() {
         // Show debug grid
         if (showDebugGrid) DebugDrawGrid();
+
+        if (isBuilding) {
+            PreviewBlock(0, player.transform.position);
+        } else if(previewBlock != null) {
+            Destroy(previewBlock);
+        };
     }
 }
