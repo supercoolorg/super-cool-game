@@ -15,7 +15,8 @@
         Move,
         Jump,
         SetPos,
-        Disconnect
+        Disconnect,
+        Ping
     }
 
     public static class NetCode {
