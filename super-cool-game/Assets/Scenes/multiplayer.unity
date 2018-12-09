@@ -434,10 +434,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3171485e15af9ed47b00ae2f1c2a40ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 1156296963878952, guid: f513314412cfff84fad74073ff1aceb5,
+  playerPrefab: {fileID: 1776720557226012, guid: f513314412cfff84fad74073ff1aceb5,
+    type: 2}
+  networkPlayerPrefab: {fileID: 1978361185441664, guid: a0c1bd6e94072cf45b4fbd5b96cc655f,
     type: 2}
   cam: {fileID: 1000315785}
-  myPort: 0
 --- !u!1 &2015692979
 GameObject:
   m_ObjectHideFlags: 0
@@ -466,6 +467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugGrid: 0
+  isBuilding: 0
   blockWidth: 4
   b_gridHeight: 30
   b_gridTeamWidth: 3
