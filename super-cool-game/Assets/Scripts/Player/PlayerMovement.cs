@@ -49,6 +49,17 @@ public class PlayerMovement : MonoBehaviour {
             velX = vel.x;
             velY = vel.y;
         }
+
+        // DEBUG: Draw server position
+        float spriteSize = 0.32f;
+        Vector3 topLeft = new Vector3(pos.x - spriteSize, pos.y+spriteSize*1.6f, 0);
+        Vector3 topRight = new Vector3(pos.x + spriteSize, pos.y+spriteSize*1.6f, 0);
+        Vector3 botLeft = new Vector3(pos.x - spriteSize, pos.y-spriteSize*1.6f, 0);
+        Vector3 botRight = new Vector3(pos.x + spriteSize, pos.y-spriteSize*1.6f, 0);
+        Debug.DrawLine(topLeft, topRight, Color.green);
+        Debug.DrawLine(topRight, botRight, Color.green);
+        Debug.DrawLine(botRight, botLeft, Color.green);
+        Debug.DrawLine(botLeft, topLeft, Color.green);
     }
 
     public bool IsGrounded {

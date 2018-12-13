@@ -8,8 +8,6 @@ public class MultiplayerGame : MonoBehaviour {
     public GameObject networkPlayerPrefab;
     public GameObject cam;
 
-    private Queue setPosQueue = new Queue();
-
     // Use this for initialization
     void Start() {
         
@@ -25,7 +23,18 @@ public class MultiplayerGame : MonoBehaviour {
 
                 switch (buffer[0]) {
                     case (byte)OpCode.SetPos:
-                        setPosQueue.Enqueue(buffer);
+                        const int message_size_per_player = 2 + 4 + 4 + 4 + 4;
+                        int n = (buffer.Length - 1) / message_size_per_player;
+                        for (int i = 0; i < n; i++) {
+                            uid = BitConverter.ToUInt16(buffer, 1 + i * message_size_per_player);
+                            Vector2 pos = new Vector2(
+                                BitConverter.ToSingle(buffer, 3 + i * message_size_per_player),
+                                BitConverter.ToSingle(buffer, 7 + i * message_size_per_player));
+                            Vector2 vel = new Vector2(
+                                BitConverter.ToSingle(buffer, 11 + i * message_size_per_player),
+                                BitConverter.ToSingle(buffer, 15 + i * message_size_per_player));
+                            MovePlayer(uid, pos, vel);
+                        }
                         break;
 
                     case (byte)OpCode.Spawn:
@@ -45,28 +54,6 @@ public class MultiplayerGame : MonoBehaviour {
                         GameObject.Find(uid.ToString()).GetComponent<Ping>().Pong();
                         break;
                 }
-            }
-        }
-    }
-
-    // FixedUpdate is called at a constant rate
-    void FixedUpdate() {
-        if (setPosQueue.Count > 0) {
-            byte[] buffer = (byte[])setPosQueue.Dequeue();
-
-            // Shared variables for the following cases
-            int uid;
-            const int message_size_per_player = 2 + 4 + 4 + 4 + 4;
-            int n = (buffer.Length - 1) / message_size_per_player;
-            for (int i = 0; i < n; i++) {
-                uid = BitConverter.ToUInt16(buffer, 1 + i * message_size_per_player);
-                Vector2 pos = new Vector2(
-                    BitConverter.ToSingle(buffer, 3 + i * message_size_per_player),
-                    BitConverter.ToSingle(buffer, 7 + i * message_size_per_player));
-                Vector2 vel = new Vector2(
-                    BitConverter.ToSingle(buffer, 11 + i * message_size_per_player),
-                    BitConverter.ToSingle(buffer, 15 + i * message_size_per_player));
-                MovePlayer(uid, pos, vel);
             }
         }
     }
