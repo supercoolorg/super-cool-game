@@ -50,7 +50,7 @@ public class MultiplayerGame : MonoBehaviour {
                         break;
 
                     case (byte)OpCode.Ping:
-                        uid = BitConverter.ToUInt16(buffer, 1);
+                        uid = NetCode.ClientPort; // me
                         GameObject.Find(uid.ToString()).GetComponent<Ping>().Pong();
                         break;
                 }
