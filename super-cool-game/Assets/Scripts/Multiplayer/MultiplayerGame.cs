@@ -1,7 +1,7 @@
 ﻿using SuperCoolNetwork;
 using System;
-using System.Collections;
 using UnityEngine;
+using Commands;
 
 public class MultiplayerGame : MonoBehaviour {
     public GameObject playerPrefab;
@@ -81,8 +81,8 @@ public class MultiplayerGame : MonoBehaviour {
     private void OnDestroy() {
         // Send to network
         if (NetCode.IsConnected) {
-            byte[] buffer = NetCode.BufferOp(OpCode.Disconnect, 1);
-            NetCode.socket.Send(buffer, buffer.Length);
+            var cmd = new Command(OpCode.Disconnect);
+            NetCode.Send(cmd);
         }
     }
 }

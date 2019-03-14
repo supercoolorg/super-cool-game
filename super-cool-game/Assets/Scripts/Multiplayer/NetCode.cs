@@ -1,23 +1,10 @@
 ﻿namespace SuperCoolNetwork {
-    using System;
     using System.Collections;
-    using System.Collections.Generic;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
+    using Commands;
 
-    public enum OpCode {
-        Error,
-        Queue,
-        FoundMatch,
-        Register,
-        Spawn,
-        Move,
-        Jump,
-        SetPos,
-        Disconnect,
-        Ping
-    }
 
     public static class NetCode {
         public const string SERVER_ADDR = "localhost";
@@ -26,12 +13,6 @@
         public static bool IsConnected { get; private set; }
         public static Queue CmdQueue = Queue.Synchronized(new Queue());
         public static int ClientPort { get; private set; }
-
-        public static byte[] BufferOp(OpCode op, int size){
-            byte[] buffer = new byte[size]; // By default filled with zeroes
-            buffer[0] = (byte) op;
-            return buffer;
-        }
 
         public static void UdpListener() {
             IPEndPoint inConn = new IPEndPoint(IPAddress.Any, ClientPort);
@@ -51,10 +32,14 @@
             var udpThread = new Thread(new ThreadStart(UdpListener));
             udpThread.Start();
 
-            byte[] buffer = BufferOp(OpCode.Register, 4);
-            socket.Send(buffer, buffer.Length);
+            var cmd = new Command(OpCode.Register);
+            Send(cmd);
 
             IsConnected = true;
+        }
+
+        public static void Send(Command cmd) {
+            socket.Send(cmd.Buffer, cmd.Buffer.Length);
         }
     }
 }

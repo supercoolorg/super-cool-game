@@ -3,6 +3,7 @@ using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using SuperCoolNetwork;
+using Commands;
 
 public class Matchmaker : MonoBehaviour {
     TcpClient client;
@@ -23,8 +24,8 @@ public class Matchmaker : MonoBehaviour {
     }
 
     private async Task<int> GetLobby() {
-        byte[] buffOut = NetCode.BufferOp(OpCode.Queue, 4);
-        await stream.WriteAsync(buffOut, 0, buffOut.Length);
+        var cmd = new Command(OpCode.Queue);
+        await stream.WriteAsync(cmd.Buffer, 0, cmd.Buffer.Length);
 
         byte[] buffIn = new byte[4];
         await stream.ReadAsync(buffIn, 0, buffIn.Length);
