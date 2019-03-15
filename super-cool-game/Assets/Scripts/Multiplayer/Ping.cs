@@ -10,7 +10,7 @@ public class Ping : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		buffer = NetCode.BufferOp(OpCode.Ping, 4);
+		buffer = NetCode.BufferOp(OpCode.Ping, 1);
 	}
 
 	// Update is called once per frame
