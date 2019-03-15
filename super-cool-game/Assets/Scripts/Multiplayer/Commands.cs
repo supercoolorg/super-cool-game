@@ -39,12 +39,24 @@ namespace Commands {
         public Command(OpCode op, params object[] args) {
             model = Utils.MODELS[op];
             modelByteCount = ByteCode.GetByteCount(model);
-            Buffer = new byte[1 + modelByteCount];
-            Buffer[0] = (byte)op;
 
-            for (int i = 0; i < args.Length; i++) {
-                SetAt(i, args[i]);
+            // When we receive a Command the buffer is already populated
+            if (Buffer == null) {
+                Buffer = new byte[1 + modelByteCount];
+                Buffer[0] = (byte)op;
+
+                for (int i = 0; i < args.Length; i++) {
+                    SetAt(i, args[i]);
+                }
             }
+        }
+
+        public static Command From(byte[] buffer) {
+            OpCode op = (OpCode)buffer[0];
+            Command cmd = new Command(op) {
+                Buffer = buffer
+            };
+            return cmd;
         }
 
         public OpCode GetOpCode() {
@@ -67,14 +79,21 @@ namespace Commands {
             return obj;
         }
 
-        private int GetByteOffset(int index) {
-            int n = index / modelByteCount;
+        public int GetRepetitions() {
+            return (Buffer.Length - 1) / modelByteCount;
+        }
 
-            int offset = n * modelByteCount;
-            for (int i = 0; i < index % modelByteCount; i++) {
+        public int GetModelSize() {
+            return model.Count;
+        }
+
+        private int GetByteOffset(int index) {
+            int n = index / model.Count;
+
+            int offset = 1 + n * modelByteCount;
+            for (int i = 0; i < index % model.Count; i++) {
                 offset += ByteCode.GetByteCount(model[i]);
             }
-            offset += 1;
 
             return offset;
         }

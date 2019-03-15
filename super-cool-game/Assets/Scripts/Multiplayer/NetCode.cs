@@ -17,9 +17,9 @@
         public static void UdpListener() {
             IPEndPoint inConn = new IPEndPoint(IPAddress.Any, ClientPort);
             while (true) {
-                byte[] buffer = socket.Receive(ref inConn);
+                    byte[] buffer = socket.Receive(ref inConn);
                 lock (CmdQueue.SyncRoot) {
-                    CmdQueue.Enqueue(buffer);
+                    CmdQueue.Enqueue(Command.From(buffer));
                 }
             }
         }

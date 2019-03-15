@@ -24,16 +24,16 @@ public class Matchmaker : MonoBehaviour {
     }
 
     private async Task<int> GetLobby() {
-        var cmd = new Command(OpCode.Queue);
-        await stream.WriteAsync(cmd.Buffer, 0, cmd.Buffer.Length);
+        Command queueCmd = new Command(OpCode.Queue);
+        await stream.WriteAsync(queueCmd.Buffer, 0, queueCmd.Buffer.Length);
 
         byte[] buffIn = new byte[4];
         await stream.ReadAsync(buffIn, 0, buffIn.Length);
 
-        byte op = buffIn[0];
-        if(op == (byte)OpCode.FoundMatch) {
-            UInt16 port = BitConverter.ToUInt16(buffIn, 1);
-            return (int)port;
+        Command inCmd = Command.From(buffIn);
+        if(inCmd.GetOpCode() == OpCode.FoundMatch) {
+            ushort port = inCmd.GetAt<ushort>(0);
+            return port;
         }
         return -1;
     }

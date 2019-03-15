@@ -16,40 +16,40 @@ public class MultiplayerGame : MonoBehaviour {
     private void Update() {
         lock (NetCode.CmdQueue.SyncRoot) {
             while (NetCode.CmdQueue.Count > 0) {
-                byte[] buffer = (byte[])NetCode.CmdQueue.Dequeue();
+                Command cmd = (Command)NetCode.CmdQueue.Dequeue();
 
                 // Shared variables for the following cases
                 int uid;
 
-                switch (buffer[0]) {
-                    case (byte)OpCode.SetPos:
-                        const int message_size_per_player = 2 + 4 + 4 + 4 + 4;
-                        int n = (buffer.Length - 1) / message_size_per_player;
+                switch (cmd.GetOpCode()) {
+                    case OpCode.SetPos:
+                        int n = cmd.GetRepetitions();
+                        int size = cmd.GetModelSize();
                         for (int i = 0; i < n; i++) {
-                            uid = BitConverter.ToUInt16(buffer, 1 + i * message_size_per_player);
+                            uid = cmd.GetAt<ushort>(0 + i * size);
                             Vector2 pos = new Vector2(
-                                BitConverter.ToSingle(buffer, 3 + i * message_size_per_player),
-                                BitConverter.ToSingle(buffer, 7 + i * message_size_per_player));
+                                cmd.GetAt<float>(1 + i * size),
+                                cmd.GetAt<float>(2 + i * size));
                             Vector2 vel = new Vector2(
-                                BitConverter.ToSingle(buffer, 11 + i * message_size_per_player),
-                                BitConverter.ToSingle(buffer, 15 + i * message_size_per_player));
+                                cmd.GetAt<float>(3 + i * size),
+                                cmd.GetAt<float>(4 + i * size));
                             MovePlayer(uid, pos, vel);
                         }
                         break;
 
-                    case (byte)OpCode.Spawn:
-                        uid = BitConverter.ToUInt16(buffer, 1);
-                        var spawnX = BitConverter.ToSingle(buffer, 3);
-                        var spawnY = BitConverter.ToSingle(buffer, 7);
+                    case OpCode.Spawn:
+                        uid = cmd.GetAt<ushort>(0);
+                        var spawnX = cmd.GetAt<float>(0);
+                        var spawnY = cmd.GetAt<float>(1);
                         Spawn(uid, new Vector2(spawnX, spawnY));
                         break;
 
-                    case (byte)OpCode.Disconnect:
-                        uid = BitConverter.ToUInt16(buffer, 1);
+                    case OpCode.Disconnect:
+                        uid = cmd.GetAt<ushort>(0);
                         Destroy(GameObject.Find(uid.ToString()));
                         break;
 
-                    case (byte)OpCode.Ping:
+                    case OpCode.Ping:
                         uid = NetCode.ClientPort; // me
                         GameObject.Find(uid.ToString()).GetComponent<Ping>().Pong();
                         break;
