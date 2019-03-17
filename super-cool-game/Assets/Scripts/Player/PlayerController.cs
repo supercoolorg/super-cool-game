@@ -1,5 +1,5 @@
-﻿using System;
-using SuperCoolNetwork;
+﻿using SuperCoolNetwork;
+using Commands;
 using UnityEngine;
 
 // This is gonna be used to send multiplayer commands too.
@@ -25,9 +25,8 @@ public class PlayerController : MonoBehaviour {
         if (newX != this.velX) {
             pm.MoveX(newX);
             if (NetCode.IsConnected) {
-                byte[] buffer = NetCode.BufferOp(OpCode.Move, 7);
-                Buffer.BlockCopy(BitConverter.GetBytes(newX), 0, buffer, 3, 4);
-                NetCode.socket.Send(buffer, buffer.Length);
+                var cmd = new Command(OpCode.Move, newX);
+                NetCode.Send(cmd);
             }
             this.velX = newX;
         }
@@ -39,9 +38,8 @@ public class PlayerController : MonoBehaviour {
 
         // Send to network
         if (NetCode.IsConnected) {
-            byte[] buffer = NetCode.BufferOp(OpCode.Jump, 7);
-            Buffer.BlockCopy(BitConverter.GetBytes(velY), 0, buffer, 3, 4);
-            NetCode.socket.Send(buffer, buffer.Length);
+            var cmd = new Command(OpCode.Jump, velY);
+            NetCode.Send(cmd);
         }
     }
 }
