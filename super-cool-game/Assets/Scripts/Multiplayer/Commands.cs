@@ -42,7 +42,12 @@ namespace Commands {
 
             // When we receive a Command the buffer is already populated
             if (Buffer == null) {
-                Buffer = new byte[1 + modelByteCount];
+                // Repetitions of the model
+                int n = 1;
+                if(model.Count != 0) {
+                    n = Math.Max(1, args.Length / model.Count);
+                }
+                Buffer = new byte[1 + modelByteCount * n];
                 Buffer[0] = (byte)op;
 
                 for (int i = 0; i < args.Length; i++) {
