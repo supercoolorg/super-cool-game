@@ -69,7 +69,7 @@ namespace Commands {
         }
 
         public void SetAt(int index, object obj) {
-            Type type = obj.GetType();
+            Type type = model[index];
             int offset = GetByteOffset(index);
             byte[] bytes = (byte[])typeof(BitConverter)
                     .GetMethod("GetBytes", new Type[] { type })
