@@ -39,8 +39,8 @@ public class MultiplayerGame : MonoBehaviour {
 
                     case OpCode.Spawn:
                         uid = cmd.GetAt<ushort>(0);
-                        var spawnX = cmd.GetAt<float>(0);
-                        var spawnY = cmd.GetAt<float>(1);
+                        var spawnX = cmd.GetAt<float>(1);
+                        var spawnY = cmd.GetAt<float>(2);
                         Spawn(uid, new Vector2(spawnX, spawnY));
                         break;
 
